@@ -3,6 +3,7 @@ import argparse
 from config import Config
 from claude_client import ClaudeClient
 from json_handler import JsonHandler
+from comfyui_client import ComfyUIClient
 
 def process_workflow(description: str) -> None:
     """Process a single workflow description and generate the JSON file"""
@@ -12,8 +13,9 @@ def process_workflow(description: str) -> None:
             print("Error: Configuration is invalid. Please check your environment variables.")
             sys.exit(1)
 
-        # Initialize Claude client
+        # Initialize clients
         claude_client = ClaudeClient(config.get_api_key())
+        comfyui_client = ComfyUIClient()
 
         print("\nGenerating workflow...")
         workflow_json = claude_client.generate_workflow(description)
@@ -27,6 +29,15 @@ def process_workflow(description: str) -> None:
         filepath = JsonHandler.save_workflow(workflow, description)
 
         print(f"\nSuccess! Workflow saved to: {filepath}")
+
+        # Execute workflow in ComfyUI
+        print("\nExecuting workflow in ComfyUI...")
+        output_path = comfyui_client.execute_workflow(workflow)
+
+        if output_path:
+            print(f"\nSuccess! Generated image saved to: {output_path}")
+        else:
+            print("\nWarning: Could not execute workflow in ComfyUI. Please ensure ComfyUI is running.")
 
     except Exception as e:
         print(f"\nError: {str(e)}")
@@ -46,6 +57,7 @@ def main():
     # Interactive mode
     print("ComfyUI Workflow Generator")
     print("=========================")
+    print("\nNOTE: Make sure ComfyUI is running locally on port 8188 to execute workflows automatically.")
 
     print("\nPlease describe the ComfyUI workflow you want to create.")
     print("Example: 'Create a workflow that loads an image, applies a blur effect, and saves the result'")

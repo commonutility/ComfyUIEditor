@@ -27,7 +27,7 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "python main.py --description 'Create a workflow that loads an image and applies a blur effect'"
+args = "python main.py --description \"Create a text-to-image workflow that generates a photo of a sunset over mountains\""
 
 [deployment]
-run = ["sh", "-c", "python main.py --description 'Create a workflow that loads an image and applies a blur effect'"]
+run = ["sh", "-c", "python main.py --description \"Create a text-to-image workflow that generates a photo of a sunset over mountains\""]
