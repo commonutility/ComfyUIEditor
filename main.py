@@ -17,16 +17,6 @@ def process_workflow(description: str) -> None:
         claude_client = ClaudeClient(config.get_api_key())
         comfyui_client = ComfyUIClient()
 
-        # Check ComfyUI connection first
-        is_connected, message = comfyui_client.check_connection()
-        if not is_connected:
-            print(f"\nError: {message}")
-            print("\nPlease ensure:")
-            print("1. ComfyUI is running locally on port 8188")
-            print("2. Required model checkpoints are installed")
-            print("3. Your GPU has sufficient memory available")
-            sys.exit(1)
-
         print("\nGenerating workflow...")
         workflow_json = claude_client.generate_workflow(description)
 
@@ -46,13 +36,8 @@ def process_workflow(description: str) -> None:
 
         if output_path:
             print(f"\nSuccess! Generated image saved to: {output_path}")
-            print("\nWorkflow execution completed successfully!")
         else:
-            print("\nWarning: Could not execute workflow in ComfyUI.")
-            print("Please ensure:")
-            print("1. ComfyUI is running locally on port 8188")
-            print("2. Required model checkpoints are available")
-            print("3. Sufficient GPU memory is available")
+            print("\nWarning: Could not execute workflow in ComfyUI. Please ensure ComfyUI is running.")
 
     except Exception as e:
         print(f"\nError: {str(e)}")
