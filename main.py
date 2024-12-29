@@ -17,6 +17,17 @@ def process_workflow(description: str) -> None:
         claude_client = ClaudeClient(config.get_api_key())
         comfyui_client = ComfyUIClient()
 
+        # Check ComfyUI connection first
+        is_connected, message = comfyui_client.check_connection()
+        if not is_connected:
+            print(f"\nWarning: {message}")
+            print("\nTo use ComfyUI:")
+            print("1. Download and run ComfyUI locally from: https://github.com/comfyanonymous/ComfyUI")
+            print("2. Ensure ComfyUI is running on port 8188")
+            print("\nWill generate and save the workflow JSON, but cannot execute it in ComfyUI.")
+        else:
+            print("\nComfyUI connection successful!")
+
         print("\nGenerating workflow...")
         workflow_json = claude_client.generate_workflow(description)
 
@@ -30,14 +41,15 @@ def process_workflow(description: str) -> None:
 
         print(f"\nSuccess! Workflow saved to: {filepath}")
 
-        # Execute workflow in ComfyUI
-        print("\nExecuting workflow in ComfyUI...")
-        output_path = comfyui_client.execute_workflow(workflow)
+        # Only try to execute if ComfyUI is available
+        if is_connected:
+            print("\nExecuting workflow in ComfyUI...")
+            output_path = comfyui_client.execute_workflow(workflow)
 
-        if output_path:
-            print(f"\nSuccess! Generated image saved to: {output_path}")
-        else:
-            print("\nWarning: Could not execute workflow in ComfyUI. Please ensure ComfyUI is running.")
+            if output_path:
+                print(f"\nSuccess! Generated image saved to: {output_path}")
+            else:
+                print("\nWarning: Failed to execute workflow in ComfyUI. The workflow JSON has been saved and can be imported manually.")
 
     except Exception as e:
         print(f"\nError: {str(e)}")
@@ -55,12 +67,20 @@ def main():
         return
 
     # Interactive mode
-    print("ComfyUI Workflow Generator")
-    print("=========================")
-    print("\nNOTE: Make sure ComfyUI is running locally on port 8188 to execute workflows automatically.")
+    print("""ComfyUI Workflow Generator
+=========================
+
+This tool generates ComfyUI workflows from text descriptions using Claude AI.
+Requirements:
+1. ANTHROPIC_API_KEY environment variable must be set
+2. ComfyUI must be running locally on port 8188 (optional, for workflow execution)
+
+If ComfyUI is not running, workflows will still be generated and saved as JSON files.
+You can import these files manually into ComfyUI later.
+""")
 
     print("\nPlease describe the ComfyUI workflow you want to create.")
-    print("Example: 'Create a workflow that loads an image, applies a blur effect, and saves the result'")
+    print("Example: 'Create a workflow that generates a photo of a mountain landscape at sunset'")
     print("\nEnter your description (or 'quit' to exit):")
 
     while True:
