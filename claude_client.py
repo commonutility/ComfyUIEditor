@@ -33,56 +33,66 @@ class ClaudeClient:
             str: JSON string containing the generated workflow
         """
         print(f"\nGenerating workflow for description: {description}")
-        prompt = f"""You are a ComfyUI workflow generator. Generate a valid JSON workflow for this description: {description}
 
-IMPORTANT: Your response must contain ONLY the JSON object with no additional text, markdown formatting, or explanations.
-
-The workflow must follow this exact structure:
-{{
-    "nodes": {{
-        "1": {{
-            "id": 1,
-            "type": "CLIPTextEncode",
+        # Create the prompt template without f-strings
+        example_workflow = '''
+{
+    "nodes": {
+        "1": {
             "class_type": "CLIPTextEncode",
-            "inputs": {{
-                "text": "your prompt here",
-                "clip": ["5", 0]
-            }}
-        }},
-        "2": {{
-            "id": 2,
-            "type": "KSampler",
-            "class_type": "KSampler",
-            "inputs": {{
-                "seed": 5567465765,
-                "steps": 20,
-                "cfg": 7,
-                "sampler_name": "euler",
-                "scheduler": "normal",
-                "denoise": 1,
-                "model": ["4", 0],
-                "positive": ["1", 0],
-                "negative": ["3", 0],
-                "latent_image": ["6", 0]
-            }}
-        }}
-    }},
-    "connections": {{
-        "2": {{
-            "inputs": {{
+            "inputs": {
+                "text": "mountain landscape",
+                "clip": ["4", 1]
+            }
+        }
+    },
+    "connections": {
+        "3": {
+            "inputs": {
                 "positive": ["1", 0]
-            }}
-        }}
-    }}
-}}
+            }
+        }
+    }
+}'''
 
-Include these essential nodes for text-to-image:
-1. CLIPTextEncode for the prompt
-2. KSampler for image generation
-3. VAEDecode for processing
-4. SaveImage for output
-
-Remember: Return ONLY the JSON object with no additional text."""
+        # Build the prompt with proper string formatting
+        prompt = (
+            f"You are a ComfyUI workflow generator. Generate a valid JSON workflow for this description: {description}\n\n"
+            "IMPORTANT: Your response must contain ONLY the JSON object with no additional text, markdown formatting, or explanations.\n\n"
+            "The workflow MUST include these required node types with their mandatory inputs:\n\n"
+            "1. CLIPTextEncode:\n"
+            '   - inputs: {\n'
+            '       "text": "prompt text" (string),\n'
+            '       "clip": [node_id, output_index] (list)\n'
+            '   }\n\n'
+            "2. KSampler:\n"
+            '   - inputs: {\n'
+            '       "seed": (integer),\n'
+            '       "steps": (integer),\n'
+            '       "cfg": (number),\n'
+            '       "sampler_name": (string),\n'
+            '       "scheduler": (string),\n'
+            '       "denoise": (number between 0-1),\n'
+            '       "model": [node_id, output_index],\n'
+            '       "positive": [node_id, output_index],\n'
+            '       "negative": [node_id, output_index],\n'
+            '       "latent_image": [node_id, output_index]\n'
+            '   }\n\n'
+            "3. VAEDecode:\n"
+            '   - inputs: {\n'
+            '       "samples": [node_id, output_index],\n'
+            '       "vae": [node_id, output_index]\n'
+            '   }\n\n'
+            "4. SaveImage:\n"
+            '   - inputs: {\n'
+            '       "images": [node_id, output_index],\n'
+            '       "filename_prefix": (string, optional)\n'
+            '   }\n\n'
+            "All node connections must use the format: [source_node_id, output_index]\n"
+            "Each node must have a unique numeric ID and include class_type and inputs fields.\n\n"
+            f"Example workflow structure:\n{example_workflow}\n\n"
+            "Remember: Return ONLY the JSON object with no additional text."
+        )
 
         try:
             print("Sending request to Claude API...")
