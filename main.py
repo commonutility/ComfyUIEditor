@@ -32,14 +32,14 @@ def process_workflow(description: str) -> None:
         workflow_json = claude_client.generate_workflow(description)
 
         # Validate the generated JSON
-        print("Validating workflow JSON...")
+        print("\nValidating workflow JSON...")
         workflow = JsonHandler.validate_workflow_json(workflow_json)
+        print("✓ JSON validation successful")
 
         # Save the workflow
-        print("Saving workflow...")
+        print("\nSaving workflow...")
         filepath = JsonHandler.save_workflow(workflow, description)
-
-        print(f"\nSuccess! Workflow saved to: {filepath}")
+        print(f"✓ Workflow saved to: {filepath}")
 
         # Only try to execute if ComfyUI is available
         if is_connected:
@@ -47,7 +47,7 @@ def process_workflow(description: str) -> None:
             output_path = comfyui_client.execute_workflow(workflow)
 
             if output_path:
-                print(f"\nSuccess! Generated image saved to: {output_path}")
+                print(f"✓ Generated image saved to: {output_path}")
             else:
                 print("\nWarning: Failed to execute workflow in ComfyUI. The workflow JSON has been saved and can be imported manually.")
 
@@ -55,11 +55,28 @@ def process_workflow(description: str) -> None:
         print(f"\nError: {str(e)}")
         sys.exit(1)
 
+def test_workflow():
+    """Run a test workflow to verify functionality"""
+    print("\n=== Running Test Workflow ===")
+    test_description = "Create a simple workflow that generates a photo of a mountain landscape"
+    try:
+        process_workflow(test_description)
+        print("\n✓ Test workflow completed successfully")
+        return True
+    except Exception as e:
+        print(f"\n✗ Test workflow failed: {str(e)}")
+        return False
+
 def main():
-    # Check if description is provided as command line argument
+    # Parse command line arguments
     parser = argparse.ArgumentParser(description='ComfyUI Workflow Generator')
     parser.add_argument('--description', '-d', help='Workflow description to process')
+    parser.add_argument('--test', action='store_true', help='Run test workflow')
     args = parser.parse_args()
+
+    if args.test:
+        test_workflow()
+        return
 
     if args.description:
         # Non-interactive mode
