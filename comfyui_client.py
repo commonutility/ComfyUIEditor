@@ -102,13 +102,15 @@ class ComfyUIClient:
                 print("\n...")
                 try:
                     out = ws.recv()
-                    print(out)
                     if isinstance(out, str):
                         print("\nReceived WebSocket message:", out)
                         message = json.loads(out)
-                        if message['type'] == 'executing' and message['data']['node'] is None:
-                            print("\nExecution completed")
-                            break
+                        if message['type'] == 'status':
+                            queue_remaining = message['data']['status']['exec_info']['queue_remaining']
+                            print(f"Queue remaining: {queue_remaining}")
+                            if queue_remaining == 0:
+                                print("\nExecution completed")
+                                break
                 except Exception as e:
                     logging.error(f"Error receiving WebSocket message: {str(e)}")
                     continue
