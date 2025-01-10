@@ -1,9 +1,15 @@
+import json
 import sys
 import argparse
 from config import Config
 from claude_client import ClaudeClient
 from json_handler import JsonHandler
 from comfyui_client import ComfyUIClient
+
+import os
+
+os.environ["ANTHROPIC_API_KEY"] = "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"
+
 
 def process_workflow(description: str) -> None:
     """Process a single workflow description and generate the JSON file"""
@@ -44,6 +50,7 @@ def process_workflow(description: str) -> None:
         # Only try to execute if ComfyUI is available
         if is_connected:
             print("\nExecuting workflow in ComfyUI...")
+            
             output_path = comfyui_client.execute_workflow(workflow)
 
             if output_path:
@@ -58,10 +65,30 @@ def process_workflow(description: str) -> None:
 def test_workflow():
     """Run a test workflow to verify functionality"""
     print("\n=== Running Test Workflow ===")
-    test_description = "Create a simple workflow that generates a photo of a mountain landscape"
+
     try:
-        process_workflow(test_description)
-        print("\n✓ Test workflow completed successfully")
+        comfyui_client = ComfyUIClient()
+
+        is_connected, message = comfyui_client.check_connection()
+
+        if is_connected:
+            print("\nExecuting workflow in ComfyUI...")
+            print(comfyui_client.preloaded_json_path)
+            with open(comfyui_client.preloaded_json_path, 'r') as f:
+                json_string = f.read()
+                workflow = json.loads(json_string)
+                
+                print("\nWORKFLOW", workflow, type(workflow))
+
+            output_path = comfyui_client.execute_workflow(workflow)
+
+
+            if output_path:
+                print(f"✓ Generated image saved to: {output_path}")
+            else:
+                print("\nWarning: Failed to execute workflow in ComfyUI. The workflow JSON has been saved and can be imported manually.")
+
+
         return True
     except Exception as e:
         print(f"\n✗ Test workflow failed: {str(e)}")
@@ -110,6 +137,10 @@ You can import these files manually into ComfyUI later.
 
             if not description:
                 print("Please enter a description or 'quit' to exit.")
+                continue
+
+            if description.lower() == 'test':
+                test_workflow()
                 continue
 
             process_workflow(description)

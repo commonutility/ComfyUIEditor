@@ -1,0 +1,26 @@
+{
+    "configurations": [
+      {
+        "type": "debugpy",
+        "request": "launch",
+        "name": "Launch Program",
+        "program": "${workspaceFolder}/${input:programName}"
+      }
+    ],
+    "inputs": [
+      {
+        "type": "pickString",
+        "id": "programName",
+        "description": "Select the Python file to debug",
+        "options": [
+          "main.py",
+          "basic_api_example.py",
+          "websockets_api_example.py",
+          "claude_client.py",
+          "comfyui_client.py",
+          "config.py",
+          "json_handler.py"
+        ]
+      }
+    ]
+  }

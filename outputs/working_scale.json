@@ -1,0 +1,47 @@
+{
+  "3": {
+    "inputs": {
+      "images": ["2", 0],
+      "filename_prefix": "output",
+      "fps": 6,
+      "format": "png",
+      "quality": 100,
+      "number_format": "{:05}"
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "Save Image"
+    },
+    "id": 3,
+    "type": "output",
+    "pos": [800, 300]
+  },
+  "1": {
+    "inputs": {
+      "image": "example.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image"
+    },
+    "id": 1,
+    "type": "input",
+    "pos": [200, 300]
+  },
+  "2": {
+    "inputs": {
+      "image": ["1", 0],
+      "width": 512,
+      "height": 512,
+      "crop": "center",
+      "upscale_method": "bilinear"
+    },
+    "class_type": "ImageScale",
+    "_meta": {
+      "title": "Image Scale"
+    },
+    "id": 2,
+    "type": "processing",
+    "pos": [500, 300]
+  }
+}
