@@ -1,6 +1,7 @@
 import anthropic
 from typing import Dict, Any
 import json
+from json_feedback import validate_and_refine_workflow
 
 class ClaudeClient:
     def __init__(self, api_key: str):
@@ -114,7 +115,11 @@ class ClaudeClient:
 
             # Extract and validate JSON from the response
             workflow_json = self._extract_json_from_response(response.content[0].text)
-            return workflow_json
+
+            # Validate and refine the workflow JSON
+            refined_workflow = validate_and_refine_workflow(workflow_json)
+
+            return json.dumps(refined_workflow)
 
         except anthropic.APIError as e:
             print(f"Claude API Error: {str(e)}")
