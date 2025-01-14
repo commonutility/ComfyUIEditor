@@ -1,0 +1,37 @@
+{
+    "nodes": {
+        "1": {
+            "class_type": "LoadImage",
+            "inputs": {
+                "image": "image.png"
+            }
+        },
+        "2": {
+            "class_type": "VAEEncode",
+            "inputs": {
+                "pixels": ["1", 0],
+                "vae": ["4", 0]
+            }
+        },
+        "3": {
+            "class_type": "VAEDecode",
+            "inputs": {
+                "samples": ["2", 0],
+                "vae": ["4", 0]
+            }
+        },
+        "4": {
+            "class_type": "CheckpointLoader",
+            "inputs": {
+                "ckpt_name": "model.ckpt"
+            }
+        },
+        "5": {
+            "class_type": "SaveImage",
+            "inputs": {
+                "images": ["3", 0],
+                "filename_prefix": "output"
+            }
+        }
+    }
+}

@@ -1,0 +1,40 @@
+{
+    "nodes": {
+        "1": {
+            "class_type": "CLIPTextEncode",
+            "inputs": {
+                "text": "an image",
+                "clip": ["4", 1]
+            }
+        },
+        "2": {
+            "class_type": "KSampler",
+            "inputs": {
+                "seed": 123456,
+                "steps": 20,
+                "cfg": 8.0,
+                "sampler_name": "euler",
+                "scheduler": "karras",
+                "denoise": 1.0,
+                "model": ["4", 1],
+                "positive": ["1", 0],
+                "negative": ["5", 0],
+                "latent_image": ["6", 0]
+            }
+        },
+        "3": {
+            "class_type": "VAEDecode",
+            "inputs": {
+                "samples": ["2", 0],
+                "vae": ["4", 0]
+            }
+        },
+        "4": {
+            "class_type": "SaveImage",
+            "inputs": {
+                "images": ["3", 0],
+                "filename_prefix": "scaled_image"
+            }
+        }
+    }
+}

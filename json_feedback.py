@@ -15,6 +15,8 @@ def validate_and_refine_workflow(workflow_json: str) -> Dict[str, Any]:
     """
     error_log: Optional[str] = None
 
+    print(f"\nVALIDATION_IN_JSONFEEDBACK")
+
     try:
         # Validate the workflow JSON
         workflow = JsonHandler.validate_workflow_json(workflow_json)
