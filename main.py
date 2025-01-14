@@ -4,6 +4,7 @@ import argparse
 from config import Config
 from claude_client import ClaudeClient
 from json_handler import JsonHandler
+from json_feedback import validate_and_refine_workflow
 from comfyui_client import ComfyUIClient
 
 import os
@@ -37,9 +38,16 @@ def process_workflow(description: str) -> None:
         print("\nGenerating workflow...")
         workflow_json = claude_client.generate_workflow(description)
 
+        # Save the raw workflow JSON to the raw_jsons folder
+        os.makedirs("raw_jsons", exist_ok=True)
+        raw_json_path = os.path.join("raw_jsons", f"{description.replace(' ', '_')}.json")
+        with open(raw_json_path, 'w') as f:
+            f.write(workflow_json)
+        print(f"✓ Raw workflow JSON saved to: {raw_json_path}")
+
         # Validate the generated JSON
         print("\nValidating workflow JSON...")
-        workflow = JsonHandler.validate_workflow_json(workflow_json)
+        workflow = validate_and_refine_workflow(workflow_json)
         print("✓ JSON validation successful")
 
         # Save the workflow
@@ -124,7 +132,7 @@ You can import these files manually into ComfyUI later.
 """)
 
     print("\nPlease describe the ComfyUI workflow you want to create.")
-    print("Example: 'Create a workflow that generates a photo of a mountain landscape at sunset'")
+    print("Example: 'Create a simply workflow that contains an input, processing node, and output. That scales an image'")
     print("\nEnter your description (or 'quit' to exit):")
 
     while True:

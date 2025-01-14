@@ -1,5 +1,7 @@
 import json
-from typing import Dict, Any
+from typing import Dict, Any, Optional
+from json_handler import JsonHandler
+from claude_client import ClaudeClient
 
 def validate_and_refine_workflow(workflow_json: str) -> Dict[str, Any]:
     """
@@ -11,66 +13,43 @@ def validate_and_refine_workflow(workflow_json: str) -> Dict[str, Any]:
     Returns:
         Dict containing the refined JSON
     """
+    error_log: Optional[str] = None
+
     try:
-        # Parse the workflow JSON
-        workflow = json.loads(workflow_json)
-        
-        # Perform validation
-        is_valid, errors = validate_workflow(workflow)
-        
-        if not is_valid:
-            # Refine the workflow if validation fails
-            refined_workflow = refine_workflow(workflow, errors)
-            return refined_workflow
-        
+        # Validate the workflow JSON
+        workflow = JsonHandler.validate_workflow_json(workflow_json)
         return workflow
+    except ValueError as e:
+        error_log = str(e)
+        print(f"\nVALIDATION_IN_JSONFEEDBACK")
+        print(f"Validation error: {error_log}")
+
+    # If validation fails, refine the workflow
+    try:
+        workflow = json.loads(workflow_json)
+        refined_workflow = refine_workflow(workflow, error_log)
+        return refined_workflow
     except json.JSONDecodeError as e:
         raise ValueError(f"Invalid JSON format: {str(e)}")
 
-def validate_workflow(workflow: Dict[str, Any]) -> (bool, Dict[str, Any]):
-    """
-    Validate the workflow JSON.
-
-    Args:
-        workflow: Dictionary containing the workflow JSON
-
-    Returns:
-        Tuple containing a boolean indicating if the workflow is valid and a dictionary of errors
-    """
-    errors = {}
-    is_valid = True
-
-    # Example validation logic
-    required_keys = ["nodes", "connections"]
-    for key in required_keys:
-        if key not in workflow:
-            is_valid = False
-            errors[key] = f"Missing required key: {key}"
-
-    # Add more validation checks as needed
-
-    return is_valid, errors
-
-def refine_workflow(workflow: Dict[str, Any], errors: Dict[str, Any]) -> Dict[str, Any]:
+def refine_workflow(workflow: Dict[str, Any], error_log: Optional[str]) -> Dict[str, Any]:
     """
     Refine the workflow JSON to correct validation errors.
 
     Args:
         workflow: Dictionary containing the workflow JSON
-        errors: Dictionary containing validation errors
+        error_log: String containing validation errors
 
     Returns:
         Dict containing the refined JSON
     """
-    # Example refinement logic
-    for key, error in errors.items():
-        if "Missing required key" in error:
-            # Add missing keys with default values
-            if key == "nodes":
-                workflow[key] = {}
-            elif key == "connections":
-                workflow[key] = {}
+    if error_log:
+        print(f"\nRefining workflow based on errors: {error_log}")
+        # Initialize ClaudeClient with your API key
+        claude_client = ClaudeClient(api_key="your_anthropic_api_key")
 
-    # Add more refinement logic as needed
+        # Use Claude to refine the workflow
+        refined_workflow = claude_client.refine_workflow_with_claude(workflow, error_log)
+        return refined_workflow
 
     return workflow

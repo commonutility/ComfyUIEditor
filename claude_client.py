@@ -1,7 +1,6 @@
 import anthropic
 from typing import Dict, Any
 import json
-from json_feedback import validate_and_refine_workflow
 
 class ClaudeClient:
     def __init__(self, api_key: str):
@@ -116,10 +115,7 @@ class ClaudeClient:
             # Extract and validate JSON from the response
             workflow_json = self._extract_json_from_response(response.content[0].text)
 
-            # Validate and refine the workflow JSON
-            refined_workflow = validate_and_refine_workflow(workflow_json)
-
-            return json.dumps(refined_workflow)
+            return workflow_json
 
         except anthropic.APIError as e:
             print(f"Claude API Error: {str(e)}")
@@ -129,3 +125,57 @@ class ClaudeClient:
         except Exception as e:
             print(f"Unexpected error: {str(e)}")
             raise Exception(f"Unexpected error while generating workflow: {str(e)}")
+
+    def refine_workflow_with_claude(self, workflow: Dict[str, Any], error_log: str) -> Dict[str, Any]:
+        """
+        Refine the workflow JSON using Claude based on the provided error log.
+
+        Args:
+            workflow: Dictionary containing the workflow JSON
+            error_log: String containing validation errors
+
+        Returns:
+            Dict containing the refined JSON
+        """
+        prompt = (
+            "You previously generated a ComfyUI workflow JSON, but it contains some errors. "
+            "Here is the workflow JSON:\n\n"
+            f"{json.dumps(workflow, indent=2)}\n\n"
+            "And here are the errors:\n\n"
+            f"{error_log}\n\n"
+            "Please correct the errors and provide a refined JSON workflow. "
+            "IMPORTANT: Your response must contain ONLY the JSON object with no additional text, markdown formatting, or explanations."
+        )
+
+        try:
+            print("Sending refinement request to Claude API...")
+            response = self.client.messages.create(
+                model="claude-3-opus-20240229",
+                max_tokens=4096,
+                temperature=0,
+                messages=[{
+                    "role": "user",
+                    "content": prompt
+                }],
+                timeout=30
+            )
+
+            print("Received response from Claude API")
+
+            if not response.content or not response.content[0].text:
+                raise Exception("Empty response received from Claude API")
+
+            # Extract and validate JSON from the response
+            refined_workflow_json = self._extract_json_from_response(response.content[0].text)
+            refined_workflow = json.loads(refined_workflow_json)
+
+            return refined_workflow
+
+        except anthropic.APIError as e:
+            print(f"Claude API Error: {str(e)}")
+            if "rate limit" in str(e).lower():
+                raise Exception("Rate limit exceeded. Please try again in a few minutes.")
+            raise Exception(f"Error calling Claude API: {str(e)}")
+        except Exception as e:
+            print(f"Unexpected error: {str(e)}")
+            raise Exception(f"Unexpected error while refining workflow: {str(e)}")
