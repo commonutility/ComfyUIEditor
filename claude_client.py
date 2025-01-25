@@ -6,6 +6,7 @@ import os
 class ClaudeClient:
     def __init__(self, api_key: str):
         self.client = anthropic.Client(api_key=api_key)
+        self.api_key = api_key
 
     def _extract_json_from_response(self, text: str) -> str:
         """Extract JSON from Claude's response by looking for the first { and last }"""
@@ -96,7 +97,8 @@ class ClaudeClient:
         )
 
         try:
-            print("Sending request to Claude API...")
+            print(f"Using API key in generate_workflow: {self.api_key[:4]}...{self.api_key[-4:]}")
+            print("Sending [RAW PROMPT] request to Claude API...")
             response = self.client.messages.create(
                 model="claude-3-opus-20240229",
                 max_tokens=4096,
@@ -149,7 +151,8 @@ class ClaudeClient:
         )
 
         try:
-            print("Sending refinement request to Claude API...")
+            print(f"Using API key in refine_workflow_with_claude: {self.api_key[:4]}...{self.api_key[-4:]}")
+            print("Sending [REFINE] request to Claude API...")
             response = self.client.messages.create(
                 model="claude-3-opus-20240229",
                 max_tokens=4096,

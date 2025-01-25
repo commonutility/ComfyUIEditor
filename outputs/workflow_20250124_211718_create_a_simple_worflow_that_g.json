@@ -3,7 +3,7 @@
     "1": {
       "class_type": "CLIPTextEncode",
       "inputs": {
-        "text": "a majestic tree with sprawling branches and lush green leaves, standing tall in a peaceful forest",
+        "text": "a scenic landscape",
         "clip": [
           "4",
           1
@@ -14,9 +14,9 @@
       "class_type": "KSampler",
       "inputs": {
         "seed": 42,
-        "steps": 25,
+        "steps": 20,
         "cfg": 8.0,
-        "sampler_name": "dpm_2_a",
+        "sampler_name": "euler",
         "scheduler": "karras",
         "denoise": 0.8,
         "model": [
@@ -59,7 +59,7 @@
     "5": {
       "class_type": "CLIPTextEncode",
       "inputs": {
-        "text": "blurry, low quality, deformed",
+        "text": "blurry, low quality",
         "clip": [
           "4",
           1
@@ -81,50 +81,9 @@
           "3",
           0
         ],
-        "filename_prefix": "majestic_tree"
+        "filename_prefix": "landscape"
       }
     }
   },
-  "connections": {
-    "2": {
-      "inputs": {
-        "model": [
-          "4",
-          0
-        ],
-        "positive": [
-          "1",
-          0
-        ],
-        "negative": [
-          "5",
-          0
-        ],
-        "latent_image": [
-          "6",
-          0
-        ]
-      }
-    },
-    "3": {
-      "inputs": {
-        "samples": [
-          "2",
-          0
-        ],
-        "vae": [
-          "4",
-          2
-        ]
-      }
-    },
-    "7": {
-      "inputs": {
-        "images": [
-          "3",
-          0
-        ]
-      }
-    }
-  }
+  "connections": []
 }

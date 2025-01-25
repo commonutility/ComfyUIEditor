@@ -1,1 +1,0 @@
-{"nodes": {"1": {"class_type": "LoadImage", "inputs": {"image": "image.png"}}, "2": {"class_type": "ScaleImage", "inputs": {"image": ["1", 0], "scale": 2.0}}, "3": {"class_type": "SaveImage", "inputs": {"images": ["2", 0], "filename_prefix": "scaled_"}}}, "connections": {}}

@@ -46,7 +46,7 @@ def process_workflow(description: str) -> None:
         print(f"✓ Raw workflow JSON saved to: {raw_json_path}")
 
         # Validate the generated JSON
-        print("\nValidating workflow JSON...")
+        print("\nValidating and refinining workflow JSON...")
         workflow = validate_and_refine_workflow(workflow_json)
         print("✓ JSON validation successful")
 

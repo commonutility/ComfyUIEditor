@@ -1,0 +1,82 @@
+{
+    "nodes": {
+        "1": {
+            "class_type": "CLIPTextEncode",
+            "inputs": {
+                "text": "an image",
+                "clip": ["4", 1]
+            }
+        },
+        "2": {
+            "class_type": "KSampler",
+            "inputs": {
+                "seed": 123456,
+                "steps": 20,
+                "cfg": 8.0,
+                "sampler_name": "euler",
+                "scheduler": "karras",
+                "denoise": 1.0,
+                "model": ["4", 1],
+                "positive": ["1", 0],
+                "negative": ["5", 0],
+                "latent_image": ["6", 0]
+            }
+        },
+        "3": {
+            "class_type": "VAEDecode",
+            "inputs": {
+                "samples": ["2", 0],
+                "vae": ["4", 0]
+            }
+        },
+        "4": {
+            "class_type": "CheckpointLoaderSimple",
+            "inputs": {
+                "ckpt_name": "v1-5-pruned-emaonly.ckpt"
+            }
+        },
+        "5": {
+            "class_type": "CLIPTextEncode",
+            "inputs": {
+                "text": "ugly, deformed, blurry",
+                "clip": ["4", 1]
+            }
+        },
+        "6": {
+            "class_type": "EmptyLatentImage",
+            "inputs": {
+                "width": 512,
+                "height": 512,
+                "batch_size": 1
+            }
+        },
+        "7": {
+            "class_type": "SaveImage",
+            "inputs": {
+                "images": ["3", 0],
+                "filename_prefix": "output"
+            }
+        }
+    },
+    "connections": {
+        "2": {
+            "inputs": {
+                "model": ["4", 1],
+                "positive": ["1", 0],
+                "negative": ["5", 0],
+                "latent_image": ["6", 0]
+            }
+        },
+        "3": {
+            "inputs": {
+                "samples": ["2", 0],
+                "vae": ["4", 0]
+            }
+        },
+        "7": {
+            "inputs": {
+                "images": ["3", 0]
+            }
+        }
+    }
+}

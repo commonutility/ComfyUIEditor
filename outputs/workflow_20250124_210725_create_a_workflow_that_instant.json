@@ -1,38 +1,34 @@
 {
   "nodes": {
     "1": {
-      "id": 1,
-      "type": "CLIPTextEncode",
       "class_type": "CLIPTextEncode",
       "inputs": {
-        "text": "a photo of a majestic mountain landscape with snow-capped peaks and lush green valleys",
+        "text": "an image",
         "clip": [
-          "5",
-          0
+          "4",
+          1
         ]
       }
     },
     "2": {
-      "id": 2,
-      "type": "KSampler",
       "class_type": "KSampler",
       "inputs": {
-        "seed": 5567465765,
+        "seed": 123456,
         "steps": 20,
-        "cfg": 7,
+        "cfg": 8.0,
         "sampler_name": "euler",
-        "scheduler": "normal",
-        "denoise": 1,
+        "scheduler": "karras",
+        "denoise": 1.0,
         "model": [
           "4",
-          0
+          1
         ],
         "positive": [
           "1",
           0
         ],
         "negative": [
-          "3",
+          "5",
           0
         ],
         "latent_image": [
@@ -42,34 +38,35 @@
       }
     },
     "3": {
-      "id": 3,
-      "type": "CLIPTextEncode",
-      "class_type": "CLIPTextEncode",
+      "class_type": "VAEDecode",
       "inputs": {
-        "text": "blurry, low quality, distorted",
-        "clip": [
-          "5",
+        "samples": [
+          "2",
+          0
+        ],
+        "vae": [
+          "4",
           0
         ]
       }
     },
     "4": {
-      "id": 4,
-      "type": "CheckpointLoaderSimple",
       "class_type": "CheckpointLoaderSimple",
       "inputs": {
         "ckpt_name": "v1-5-pruned-emaonly.ckpt"
       }
     },
     "5": {
-      "id": 5,
-      "type": "CLIPTokenizer",
-      "class_type": "CLIPTokenizer",
-      "inputs": {}
+      "class_type": "CLIPTextEncode",
+      "inputs": {
+        "text": "ugly, deformed, blurry",
+        "clip": [
+          "4",
+          1
+        ]
+      }
     },
     "6": {
-      "id": 6,
-      "type": "EmptyLatentImage",
       "class_type": "EmptyLatentImage",
       "inputs": {
         "width": 512,
@@ -78,66 +75,53 @@
       }
     },
     "7": {
-      "id": 7,
-      "type": "VAEDecode",
-      "class_type": "VAEDecode",
-      "inputs": {
-        "samples": [
-          "2",
-          0
-        ],
-        "vae": [
-          "8",
-          0
-        ]
-      }
-    },
-    "8": {
-      "id": 8,
-      "type": "VAELoader",
-      "class_type": "VAELoader",
-      "inputs": {
-        "vae_name": "vae-ft-mse-840000-ema-pruned"
-      }
-    },
-    "9": {
-      "id": 9,
-      "type": "SaveImage",
       "class_type": "SaveImage",
       "inputs": {
-        "filename_prefix": "mountain_landscape",
         "images": [
-          "7",
+          "3",
           0
-        ]
+        ],
+        "filename_prefix": "output"
       }
     }
   },
   "connections": {
     "2": {
       "inputs": {
+        "model": [
+          "4",
+          1
+        ],
         "positive": [
           "1",
           0
         ],
         "negative": [
-          "3",
+          "5",
+          0
+        ],
+        "latent_image": [
+          "6",
+          0
+        ]
+      }
+    },
+    "3": {
+      "inputs": {
+        "samples": [
+          "2",
+          0
+        ],
+        "vae": [
+          "4",
           0
         ]
       }
     },
     "7": {
       "inputs": {
-        "samples": [
-          "2",
-          0
-        ]
-      }
-    },
-    "9": {
-      "inputs": {
         "images": [
-          "7",
+          "3",
           0
         ]
       }
